@@ -1,0 +1,40 @@
+name: Check Required Files
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Check for required files
+        run: |
+          missing=0
+          required_files=(
+            "README.md"
+            "package.json"
+            "src/App.jsx"
+            "src/main.jsx"
+            "src/components"
+            "src/context"
+            "src/services"
+            "public/index.html"
+          )
+          for file in "${required_files[@]}"; do
+            if [ ! -e "$file" ]; then
+              echo "Missing: $file"
+              missing=1
+            fi
+          done
+          if [ $missing -eq 1 ]; then
+            echo "❌ Some required files or folders are missing."
+            exit 1
+          else
+            echo "✅ All required files and folders are present."
+          fi
