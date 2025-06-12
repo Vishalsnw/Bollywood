@@ -1,40 +1,30 @@
-name: Check Required Files
+name: Yarn React Build
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  check-files:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Check for required files
-        run: |
-          missing=0
-          required_files=(
-            "README.md"
-            "package.json"
-            "src/App.jsx"
-            "src/main.jsx"
-            "src/components"
-            "src/context"
-            "src/services"
-            "public/index.html"
-          )
-          for file in "${required_files[@]}"; do
-            if [ ! -e "$file" ]; then
-              echo "Missing: $file"
-              missing=1
-            fi
-          done
-          if [ $missing -eq 1 ]; then
-            echo "❌ Some required files or folders are missing."
-            exit 1
-          else
-            echo "✅ All required files and folders are present."
-          fi
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🟢 Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: 📦 Install Dependencies using Yarn
+        run: yarn install
+
+      - name: ⚙️ Build the React App
+        run: yarn build
+
+      - name: ✅ Done
+        run: echo "Build completed successfully!"u
