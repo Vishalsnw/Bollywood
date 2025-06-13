@@ -1,5 +1,3 @@
-// src/App.js
-
 import React from "react";
 import { Provider } from "react-redux";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
@@ -15,20 +13,19 @@ import WinnerReveal from "./features/oscars/WinnerReveal";
 
 // Dummy Data
 const dummyProducers = [
-  { name: "Karan Johar", wealth: 600, rankChange: 1 },
-  { name: "Aditya Chopra", wealth: 580, rankChange: -1 },
+  { id: 1, name: "Karan Johar", wealth: 600 },
+  { id: 2, name: "Aditya Chopra", wealth: 580 },
 ];
 
 const dummyNews = [
-  "Karan Johar takes ₹500cr loan from SBI!",
-  "Ram Gopal Varma declares bankruptcy 😬",
-  "Rohit Shetty launches new movie with AI actors!",
+  { headline: "Karan Johar takes ₹500cr loan from SBI!", date: "2025-06-12" },
+  { headline: "Ram Gopal Varma declares bankruptcy 😬", date: "2025-06-11" },
+  { headline: "Rohit Shetty launches new movie with AI actors!", date: "2025-06-13" },
 ];
 
 const dummyWinners = [
-  "Ranbir Kapoor - Best Actor",
-  "Alia Bhatt - Best Actress",
-  "RRR - Best Film",
+  { title: "RRR", producerName: "Rajamouli" },
+  { title: "Ranbir Kapoor", producerName: "Best Actor" },
 ];
 
 // MUI Theme
@@ -69,7 +66,8 @@ function App() {
                 <Route path="/game" element={<GameScreen />} />
                 <Route path="/producers" element={<ProducerList producers={dummyProducers} />} />
                 <Route path="/news" element={<NewsFeed news={dummyNews} />} />
-                <Route path="/oscars/winners" element={<WinnerReveal winners={dummyWinners} />} />
+                <Route path="/oscars/winners" element={<WinnerReveal nominations={[]} winners={dummyWinners} />} />
+                <Route path="*" element={<div><h1>404 - Page Not Found</h1></div>} />
               </Routes>
             </div>
           </div>
