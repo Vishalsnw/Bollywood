@@ -1,6 +1,15 @@
 import React from 'react';
 
-const NewsFeed = ({ news }) => {
+const NewsFeed = ({ news = [] }) => {
+  if (news.length === 0) {
+    return (
+      <div>
+        <h1>News Feed</h1>
+        <p>No news available at the moment.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>News Feed</h1>
