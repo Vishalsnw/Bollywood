@@ -1,0 +1,1 @@
+import React from 'react';\nimport { Card, CardContent, Typography } from '@mui/material';\nconst GameScreen = () => (\n  <Card style={{ margin: 20, padding: 20 }}><CardContent><Typography variant="h5">Game coming soon with better UI!</Typography></CardContent></Card>\n);\nexport default GameScreen;
