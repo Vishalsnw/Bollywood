@@ -1,5 +1,3 @@
-// src/features/storage/localStorage.js
-
 const STORAGE_KEY = "bollywood_sim_game_state";
 
 export function saveState(state) {
@@ -7,7 +5,7 @@ export function saveState(state) {
     const serializedState = JSON.stringify(state);
     localStorage.setItem(STORAGE_KEY, serializedState);
   } catch (err) {
-    // Ignore write errors
+    console.error("Failed to save state", err);
   }
 }
 
@@ -19,8 +17,7 @@ export function loadState() {
     }
     return JSON.parse(serializedState);
   } catch (err) {
+    console.error("Failed to load state", err);
     return undefined;
   }
 }
-
-// end of code
