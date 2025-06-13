@@ -10,6 +10,7 @@ import GameScreen from "./components/GameScreen";
 import ProducerList from "./features/producers/ProducerList";
 import NewsFeed from "./features/news/NewsFeed";
 import WinnerReveal from "./features/oscars/WinnerReveal";
+import Home from "./pages/Home";
 
 // Dummy Data
 const dummyProducers = [
@@ -62,9 +63,9 @@ function App() {
             <Sidebar />
             <div style={{ flex: 1, padding: "20px" }}>
               <Routes>
-                <Route path="/" element={<GameScreen />} />
-                <Route path="/game" element={<GameScreen />} />
-                <Route path="/producers" element={<ProducerList producers={dummyProducers} />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/game" element={<GameScreen year={2025} producers={dummyProducers} />} />
+                <Route path="/producers" element={<ProducerList producers={dummyProducers} previousRanks={{}} />} />
                 <Route path="/news" element={<NewsFeed news={dummyNews} />} />
                 <Route path="/oscars/winners" element={<WinnerReveal nominations={[]} winners={dummyWinners} />} />
                 <Route path="*" element={<div><h1>404 - Page Not Found</h1></div>} />
