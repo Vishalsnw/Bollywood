@@ -13,10 +13,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Node.js 20
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20'
 
       - name: Install dependencies
         run: yarn install
@@ -25,7 +25,7 @@ jobs:
         run: |
           mkdir -p src/components
           if [ ! -f src/components/Sidebar.js ]; then
-            cat <<EOF > src/components/Sidebar.js
+            cat <<'EOF' > src/components/Sidebar.js
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -50,7 +50,7 @@ EOF
         run: |
           mkdir -p src/features/oscars
           if [ ! -f src/features/oscars/WinnerReveal.js ]; then
-            cat <<EOF > src/features/oscars/WinnerReveal.js
+            cat <<'EOF' > src/features/oscars/WinnerReveal.js
 import React, { useState } from 'react';
 import { Fade } from '@mui/material';
 
@@ -75,7 +75,7 @@ EOF
         run: |
           mkdir -p src/features/producers
           if [ ! -f src/features/producers/ProducerList.js ]; then
-            cat <<EOF > src/features/producers/ProducerList.js
+            cat <<'EOF' > src/features/producers/ProducerList.js
 import React from 'react';
 
 const ProducerList = ({ producers }) => {
@@ -101,7 +101,7 @@ EOF
         run: |
           mkdir -p src/features/news
           if [ ! -f src/features/news/NewsFeed.js ]; then
-            cat <<EOF > src/features/news/NewsFeed.js
+            cat <<'EOF' > src/features/news/NewsFeed.js
 import React from 'react';
 import { Slide } from '@mui/material';
 
@@ -131,3 +131,4 @@ EOF
 
       - name: Build App
         run: yarn run build
+        
