@@ -14,7 +14,7 @@
     "react-router-dom": "^7.6.2",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
-    "framer-motion": "^10.14.0" // Correctly added the new dependency
+    "framer-motion": "^10.14.0"
   },
   "engines": {
     "node": ">=20"
