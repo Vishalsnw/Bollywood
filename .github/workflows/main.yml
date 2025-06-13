@@ -21,64 +21,57 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Create Sidebar.js (only if not exists)
+      - name: Add Sidebar if not exists
         run: |
           mkdir -p src/components
           if [ ! -f src/components/Sidebar.js ]; then
-            cat << 'EOF' > src/components/Sidebar.js
-import React from "react";
-import { Link } from "react-router-dom";
+            echo "import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
-    <aside style={{ width: "200px", padding: "20px", background: "#eee" }}>
+    <aside style={{ width: '200px', padding: '20px', background: '#eee' }}>
       <h3>Menu</h3>
       <ul>
-        <li><Link to="/nominations">Oscar Nominations</Link></li>
-        <li><Link to="/winners">Oscar Winners</Link></li>
-        <li><Link to="/producers">Producers</Link></li>
+        <li><Link to='/nominations'>Oscar Nominations</Link></li>
+        <li><Link to='/winners'>Oscar Winners</Link></li>
+        <li><Link to='/producers'>Producers</Link></li>
       </ul>
     </aside>
   );
 };
 
-export default Sidebar;
-EOF
+export default Sidebar;" > src/components/Sidebar.js
           fi
 
-      - name: Create WinnerReveal.js (only if not exists)
+      - name: Add WinnerReveal if not exists
         run: |
           mkdir -p src/features/oscars
           if [ ! -f src/features/oscars/WinnerReveal.js ]; then
-            cat << 'EOF' > src/features/oscars/WinnerReveal.js
-import React, { useState } from "react";
-import { Fade } from "@mui/material";
+            echo "import React, { useState } from 'react';
+import { Fade } from '@mui/material';
 
 const WinnerReveal = ({ winner }) => {
   const [show, setShow] = useState(false);
 
   return (
-    <div style={{ marginTop: "20px" }}>
+    <div style={{ marginTop: '20px' }}>
       <button onClick={() => setShow(true)}>Reveal Winner</button>
       <Fade in={show}>
-        <div>
-          <h2 style={{ color: "green" }}>{winner}</h2>
-        </div>
+        <div><h2 style={{ color: 'green' }}>{winner}</h2></div>
       </Fade>
     </div>
   );
 };
 
-export default WinnerReveal;
-EOF
+export default WinnerReveal;" > src/features/oscars/WinnerReveal.js
           fi
 
-      - name: Create ProducerList.js (only if not exists)
+      - name: Add ProducerList if not exists
         run: |
           mkdir -p src/features/producers
           if [ ! -f src/features/producers/ProducerList.js ]; then
-            cat << 'EOF' > src/features/producers/ProducerList.js
-import React from "react";
+            echo "import React from 'react';
 
 const ProducerList = ({ producers }) => {
   const sorted = [...producers].sort((a, b) => b.wealth - a.wealth);
@@ -88,35 +81,33 @@ const ProducerList = ({ producers }) => {
       {sorted.map((p, index) => (
         <li key={p.name}>
           #{index + 1} {p.name} - ₹{p.wealth} Cr
-          {p.rankChange > 0 ? " 🔼" : p.rankChange < 0 ? " 🔽" : ""}
+          {p.rankChange > 0 ? ' 🔼' : p.rankChange < 0 ? ' 🔽' : ''}
         </li>
       ))}
     </ul>
   );
 };
 
-export default ProducerList;
-EOF
+export default ProducerList;" > src/features/producers/ProducerList.js
           fi
 
-      - name: Create NewsFeed.js (only if not exists)
+      - name: Add NewsFeed if not exists
         run: |
           mkdir -p src/features/news
           if [ ! -f src/features/news/NewsFeed.js ]; then
-            cat << 'EOF' > src/features/news/NewsFeed.js
-import React from "react";
-import { Slide } from "@mui/material";
+            echo "import React from 'react';
+import { Slide } from '@mui/material';
 
 const NewsFeed = ({ news }) => {
   return (
     <div>
       <h2>Breaking News</h2>
       {news.map((item, idx) => (
-        <Slide direction="up" in={true} mountOnEnter unmountOnExit key={idx}>
-          <div style={{ background: "#fff3e0", padding: "10px", margin: "10px 0" }}>
+        <Slide direction='up' in={true} mountOnEnter unmountOnExit key={idx}>
+          <div style={{ background: '#fff3e0', padding: '10px', margin: '10px 0' }}>
             📰 {item.headline}
-            {item.type === "loan" && <span> 💸 Took a loan</span>}
-            {item.type === "bankrupt" && <span> 🚨 Bankrupt!</span>}
+            {item.type === 'loan' && <span> 💸 Took a loan</span>}
+            {item.type === 'bankrupt' && <span> 🚨 Bankrupt!</span>}
           </div>
         </Slide>
       ))}
@@ -124,12 +115,11 @@ const NewsFeed = ({ news }) => {
   );
 };
 
-export default NewsFeed;
-EOF
+export default NewsFeed;" > src/features/news/NewsFeed.js
           fi
 
-      - name: Install peer dependencies
+      - name: Install peer UI dependencies
         run: yarn add react-router-dom @mui/material @emotion/react @emotion/styled
 
-      - name: Build the app
+      - name: Build App
         run: yarn run build
