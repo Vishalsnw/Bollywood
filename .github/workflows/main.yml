@@ -131,4 +131,3 @@ EOF
 
       - name: Build App
         run: yarn run build
-        
