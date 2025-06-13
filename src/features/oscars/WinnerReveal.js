@@ -1,1 +1,34 @@
-import React, { useState } from 'react';\nimport { Button, Typography, Fade } from '@mui/material';\nconst WinnerReveal = () => {\n  const [show, setShow] = useState(false);\n  return (\n    <div>\n      <Typography variant="h4">Oscar Nominations</Typography>\n      <Button onClick={() => setShow(true)}>Reveal Winners</Button>\n      <Fade in={show}><div><Typography variant="h5">🏆 Best Actor: John Doe</Typography></div></Fade>\n    </div>\n  );\n};\nexport default WinnerReveal;
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+
+const WinnerReveal = ({ nominations, winners }) => {
+  const [showWinners, setShowWinners] = useState(false);
+
+  return (
+    <div>
+      <h1>Oscar Nominations</h1>
+      <ul>
+        {nominations.map((nom, index) => (
+          <li key={index}>{nom.title} by {nom.producerName}</li>
+        ))}
+      </ul>
+      <button onClick={() => setShowWinners(true)}>Reveal Winners</button>
+      {showWinners && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <h1>Oscar Winners</h1>
+          <ul>
+            {winners.map((win, index) => (
+              <li key={index}>{win.title} by {win.producerName}</li>
+            ))}
+          </ul>
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default WinnerReveal;
