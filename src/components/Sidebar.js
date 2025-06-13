@@ -1,1 +1,32 @@
-import React from 'react';\nimport { Drawer, List, ListItem, ListItemText } from '@mui/material';\nimport { Link } from 'react-router-dom';\nconst Sidebar = () => (\n  <Drawer variant="permanent">\n    <List>\n      <ListItem button component={Link} to="/movies"><ListItemText primary="Movies" /></ListItem>\n      <ListItem button component={Link} to="/producers"><ListItemText primary="Producers" /></ListItem>\n      <ListItem button component={Link} to="/nominations"><ListItemText primary="Oscar Nominations" /></ListItem>\n      <ListItem button component={Link} to="/winners"><ListItemText primary="Oscar Winners" /></ListItem>\n      <ListItem button component={Link} to="/news"><ListItemText primary="News" /></ListItem>\n      <ListItem button component={Link} to="/game"><ListItemText primary="Game" /></ListItem>\n    </List>\n  </Drawer>\n);\nexport default Sidebar;
+import React from 'react';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, IconButton } from '@mui/material';
+import { Movie as MovieIcon, Star as StarIcon, AttachMoney as MoneyIcon } from '@mui/icons-material';
+
+const Sidebar = ({ open, toggleSidebar }) => {
+  return (
+    <Drawer anchor="left" open={open} onClose={toggleSidebar}>
+      <List>
+        <ListItem button>
+          <ListItemIcon>
+            <MovieIcon />
+          </ListItemIcon>
+          <ListItemText primary="Producers" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon>
+            <StarIcon />
+          </ListItemIcon>
+          <ListItemText primary="Oscar Nominations" />
+        </ListItem>
+        <ListItem button>
+          <ListItemIcon>
+            <MoneyIcon />
+          </ListItemIcon>
+          <ListItemText primary="Oscar Winners" />
+        </ListItem>
+      </List>
+    </Drawer>
+  );
+};
+
+export default Sidebar;

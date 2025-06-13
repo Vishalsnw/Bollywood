@@ -1,52 +1,28 @@
-// src/components/GameScreen.js
+import React from 'react';
+import { Grid, Typography, Button } from '@mui/material';
+import { motion } from 'framer-motion';
 
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { startGame, playNextYear, resetGame } from "../features/game/gameSlice";
-import ProducerList from "../features/producers/ProducerList";
-import MovieList from "../features/movies/MovieList";
-import NewsFeed from "../features/news/NewsFeed";
-import { Box, Button, Typography, Stack } from "@mui/material";
-
-export default function GameScreen() {
-  const dispatch = useDispatch();
-  const { running, year, producers, movies, oscars, news } = useSelector((state) => state.game);
-
-  const latestOscar = oscars && oscars.length > 0 ? oscars[oscars.length - 1] : null;
-  const moviesThisYear = movies.filter((m) => m.year === year - 1);
-
+const GameScreen = ({ producers, year }) => {
   return (
-    <Box sx={{ p: 2 }}>
-      <Typography variant="h4" sx={{ mb: 2, textAlign: "center" }}>
-        Bollywood Producer Tycoon
-      </Typography>
-      <Stack direction="row" spacing={2} justifyContent="center" sx={{ mb: 2 }}>
-        {!running ? (
-          <Button variant="contained" color="primary" onClick={() => dispatch(startGame())}>
-            Start Game
-          </Button>
-        ) : (
-          <>
-            <Button variant="contained" color="success" onClick={() => dispatch(playNextYear())}>
-              Next Year
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={() => dispatch(resetGame())}>
-              Reset
-            </Button>
-          </>
-        )}
-      </Stack>
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        Year: {year} {running ? "" : "(Paused)"}
-      </Typography>
-      <ProducerList producers={producers} />
-      <Typography variant="h6" sx={{ mt: 3 }}>
-        Movies Released {year > 2025 ? `(Year ${year - 1})` : ""}
-      </Typography>
-      <MovieList movies={moviesThisYear} oscarWinnerId={latestOscar ? latestOscar.id : null} />
-      <NewsFeed news={news} />
-    </Box>
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="h4">Year: {year}</Typography>
+      </Grid>
+      {producers.map(producer => (
+        <Grid item xs={4} key={producer.id}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+          >
+            <Typography variant="h6">{producer.name}</Typography>
+            <Typography variant="body2">Wealth: ₹{producer.wealth.toLocaleString()}</Typography>
+            <Button variant="contained">Take Action</Button>
+          </motion.div>
+        </Grid>
+      ))}
+    </Grid>
   );
-}
+};
 
-// end of code
+export default GameScreen;
