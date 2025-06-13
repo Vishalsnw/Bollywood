@@ -1,1 +1,18 @@
-import React from 'react';\nimport { Card, CardContent, Typography, Slide } from '@mui/material';\nconst news = [\n  '🎬 Producer X took ₹400 Cr loan for a flop movie!',\n  '🔻 Producer Y declared bankruptcy!',\n  '🔥 Oscar night drama: unexpected winners!'\n];\nconst NewsFeed = () => (\n  <div>{news.map((n, i) => (\n    <Slide direction="up" in={true} timeout={500 + i * 300} key={i}><Card style={{margin: 10}}><CardContent><Typography>{n}</Typography></CardContent></Card></Slide>\n  ))}</div>\n);\nexport default NewsFeed;
+import React from 'react';
+
+const NewsFeed = ({ news }) => {
+  return (
+    <div>
+      <h1>News Feed</h1>
+      <ul>
+        {news.map((item, index) => (
+          <li key={index}>
+            <strong>{item.headline}</strong> - {item.date}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default NewsFeed;
