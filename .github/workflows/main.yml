@@ -1,58 +1,131 @@
-name: Auto Update Bollywood App UI
+name: Bollywood App Enhancements
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
-  update-ui:
+  enhance-ui:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
-      - name: Create missing folders only if not present
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Create Sidebar.js
+        if: "!exists('src/components/Sidebar.js')"
         run: |
           mkdir -p src/components
+          cat << 'EOF' > src/components/Sidebar.js
+import React from "react";
+import { Link } from "react-router-dom";
+
+const Sidebar = () => {
+  return (
+    <aside style={{ width: "200px", padding: "20px", background: "#eee" }}>
+      <h3>Menu</h3>
+      <ul>
+        <li><Link to="/nominations">Oscar Nominations</Link></li>
+        <li><Link to="/winners">Oscar Winners</Link></li>
+        <li><Link to="/producers">Producers</Link></li>
+      </ul>
+    </aside>
+  );
+};
+
+export default Sidebar;
+EOF
+
+      - name: Create WinnerReveal.js
+        if: "!exists('src/features/oscars/WinnerReveal.js')"
+        run: |
           mkdir -p src/features/oscars
-          mkdir -p src/features/news
+          cat << 'EOF' > src/features/oscars/WinnerReveal.js
+import React, { useState } from "react";
+import { Fade } from "@mui/material";
+
+const WinnerReveal = ({ winner }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div style={{ marginTop: "20px" }}>
+      <button onClick={() => setShow(true)}>Reveal Winner</button>
+      <Fade in={show}>
+        <div>
+          <h2 style={{ color: "green" }}>{winner}</h2>
+        </div>
+      </Fade>
+    </div>
+  );
+};
+
+export default WinnerReveal;
+EOF
+
+      - name: Create ProducerList.js
+        if: "!exists('src/features/producers/ProducerList.js')"
+        run: |
           mkdir -p src/features/producers
-          mkdir -p src/features/game
+          cat << 'EOF' > src/features/producers/ProducerList.js
+import React from "react";
 
-      - name: Add or overwrite Sidebar.js safely
-        run: |
-          echo "import React from 'react';\nimport { Drawer, List, ListItem, ListItemText } from '@mui/material';\nimport { Link } from 'react-router-dom';\nconst Sidebar = () => (\n  <Drawer variant=\"permanent\">\n    <List>\n      <ListItem button component={Link} to=\"/movies\"><ListItemText primary=\"Movies\" /></ListItem>\n      <ListItem button component={Link} to=\"/producers\"><ListItemText primary=\"Producers\" /></ListItem>\n      <ListItem button component={Link} to=\"/nominations\"><ListItemText primary=\"Oscar Nominations\" /></ListItem>\n      <ListItem button component={Link} to=\"/winners\"><ListItemText primary=\"Oscar Winners\" /></ListItem>\n      <ListItem button component={Link} to=\"/news\"><ListItemText primary=\"News\" /></ListItem>\n      <ListItem button component={Link} to=\"/game\"><ListItemText primary=\"Game\" /></ListItem>\n    </List>\n  </Drawer>\n);\nexport default Sidebar;" > src/components/Sidebar.js
+const ProducerList = ({ producers }) => {
+  const sorted = [...producers].sort((a, b) => b.wealth - a.wealth);
 
-      - name: Add WinnerReveal.js with animation
-        run: |
-          echo "import React, { useState } from 'react';\nimport { Button, Typography, Fade } from '@mui/material';\nconst WinnerReveal = () => {\n  const [show, setShow] = useState(false);\n  return (\n    <div>\n      <Typography variant=\"h4\">Oscar Nominations</Typography>\n      <Button onClick={() => setShow(true)}>Reveal Winners</Button>\n      <Fade in={show}><div><Typography variant=\"h5\">🏆 Best Actor: John Doe</Typography></div></Fade>\n    </div>\n  );\n};\nexport default WinnerReveal;" > src/features/oscars/WinnerReveal.js
+  return (
+    <ul>
+      {sorted.map((p, index) => (
+        <li key={p.name}>
+          #{index + 1} {p.name} - ₹{p.wealth} Cr
+          {p.rankChange > 0 ? " 🔼" : p.rankChange < 0 ? " 🔽" : ""}
+        </li>
+      ))}
+    </ul>
+  );
+};
 
-      - name: Add animated NewsFeed.js
-        run: |
-          echo "import React from 'react';\nimport { Card, CardContent, Typography, Slide } from '@mui/material';\nconst news = [\n  '🎬 Producer X took ₹400 Cr loan for a flop movie!',\n  '🔻 Producer Y declared bankruptcy!',\n  '🔥 Oscar night drama: unexpected winners!'\n];\nconst NewsFeed = () => (\n  <div>{news.map((n, i) => (\n    <Slide direction=\"up\" in={true} timeout={500 + i * 300} key={i}><Card style={{margin: 10}}><CardContent><Typography>{n}</Typography></CardContent></Card></Slide>\n  ))}</div>\n);\nexport default NewsFeed;" > src/features/news/NewsFeed.js
+export default ProducerList;
+EOF
 
-      - name: Add ProducerList with ranking and wealth
+      - name: Create NewsFeed.js
+        if: "!exists('src/features/news/NewsFeed.js')"
         run: |
-          echo "import React, { useState, useEffect } from 'react';\nimport { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';\nimport ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';\nimport ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';\nconst producers = [\n  { name: 'Producer A', wealth: 900, previousRank: 2 },\n  { name: 'Producer B', wealth: 850, previousRank: 1 },\n  { name: 'Producer C', wealth: 800, previousRank: 3 }\n];\nconst ProducerList = () => {\n  const [sorted, setSorted] = useState([]);\n  useEffect(() => {\n    const sortedList = producers.sort((a, b) => b.wealth - a.wealth).map((p, i) => ({ ...p, rank: i + 1 }));\n    setSorted(sortedList);\n  }, []);\n  return (\n    <TableContainer component={Paper}>\n      <Typography variant=\"h5\" style={{ margin: 10 }}>Top Wealthy Producers</Typography>\n      <Table>\n        <TableHead><TableRow><TableCell>Rank</TableCell><TableCell>Name</TableCell><TableCell>Wealth (Cr)</TableCell><TableCell>Change</TableCell></TableRow></TableHead>\n        <TableBody>\n          {sorted.map((p, idx) => (\n            <TableRow key={p.name}>\n              <TableCell>{p.rank}</TableCell>\n              <TableCell>{p.name}</TableCell>\n              <TableCell>{p.wealth}</TableCell>\n              <TableCell>{p.rank < p.previousRank ? <ArrowDropUpIcon color=\"success\" /> : p.rank > p.previousRank ? <ArrowDropDownIcon color=\"error\" /> : ''}</TableCell>\n            </TableRow>\n          ))}\n        </TableBody>\n      </Table>\n    </TableContainer>\n  );\n};\nexport default ProducerList;" > src/features/producers/ProducerList.js
+          mkdir -p src/features/news
+          cat << 'EOF' > src/features/news/NewsFeed.js
+import React from "react";
+import { Slide } from "@mui/material";
 
-      - name: Add GameScreen placeholder (polished look later)
-        run: |
-          echo "import React from 'react';\nimport { Card, CardContent, Typography } from '@mui/material';\nconst GameScreen = () => (\n  <Card style={{ margin: 20, padding: 20 }}><CardContent><Typography variant=\"h5\">Game coming soon with better UI!</Typography></CardContent></Card>\n);\nexport default GameScreen;" > src/features/game/GameScreen.js
+const NewsFeed = ({ news }) => {
+  return (
+    <div>
+      <h2>Breaking News</h2>
+      {news.map((item, idx) => (
+        <Slide direction="up" in={true} mountOnEnter unmountOnExit key={idx}>
+          <div style={{ background: "#fff3e0", padding: "10px", margin: "10px 0" }}>
+            📰 {item.headline}
+            {item.type === "loan" && <span> 💸 Took a loan</span>}
+            {item.type === "bankrupt" && <span> 🚨 Bankrupt!</span>}
+          </div>
+        </Slide>
+      ))}
+    </div>
+  );
+};
 
-      - name: Update App.js with full routing
-        run: |
-          echo "import React from 'react';\nimport { BrowserRouter as Router, Route, Routes } from 'react-router-dom';\nimport Sidebar from './components/Sidebar';\nimport MovieList from './features/movies/MovieList';\nimport ProducerList from './features/producers/ProducerList';\nimport WinnerReveal from './features/oscars/WinnerReveal';\nimport NewsFeed from './features/news/NewsFeed';\nimport GameScreen from './features/game/GameScreen';\nconst App = () => (\n  <Router>\n    <div style={{ display: 'flex' }}>\n      <Sidebar />\n      <div style={{ marginLeft: 240, padding: 20 }}>\n        <Routes>\n          <Route path=\"/movies\" element={<MovieList />} />\n          <Route path=\"/producers\" element={<ProducerList />} />\n          <Route path=\"/nominations\" element={<div>Oscar Nominations Placeholder</div>} />\n          <Route path=\"/winners\" element={<WinnerReveal />} />\n          <Route path=\"/news\" element={<NewsFeed />} />\n          <Route path=\"/game\" element={<GameScreen />} />\n        </Routes>\n      </div>\n    </div>\n  </Router>\n);\nexport default App;" > src/App.js
+export default NewsFeed;
+EOF
 
-      - name: Commit and push changes
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-          git add src/components/Sidebar.js src/features/**/*.js src/App.js
-          git commit -m "UI overhaul: sidebar, animated winners/news, sorted producers, game placeholder"
-          git push
-          
+      - name: Install peer dependencies (e.g. react-router-dom)
+        run: yarn add react-router-dom @mui/material @emotion/react @emotion/styled
+
+      - name: Build project
+        run: yarn run build
