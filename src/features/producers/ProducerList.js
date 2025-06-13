@@ -1,7 +1,16 @@
 import React from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 
-const ProducerList = ({ producers, previousRanks }) => {
+const ProducerList = ({ producers = [], previousRanks = {} }) => {
+  if (producers.length === 0) {
+    return (
+      <div>
+        <h1>Producers List</h1>
+        <p>No producers available.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1>Producers List</h1>
