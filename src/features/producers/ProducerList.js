@@ -1,1 +1,26 @@
-import React, { useState, useEffect } from 'react';\nimport { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography } from '@mui/material';\nimport ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';\nimport ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';\nconst producers = [\n  { name: 'Producer A', wealth: 900, previousRank: 2 },\n  { name: 'Producer B', wealth: 850, previousRank: 1 },\n  { name: 'Producer C', wealth: 800, previousRank: 3 }\n];\nconst ProducerList = () => {\n  const [sorted, setSorted] = useState([]);\n  useEffect(() => {\n    const sortedList = producers.sort((a, b) => b.wealth - a.wealth).map((p, i) => ({ ...p, rank: i + 1 }));\n    setSorted(sortedList);\n  }, []);\n  return (\n    <TableContainer component={Paper}>\n      <Typography variant="h5" style={{ margin: 10 }}>Top Wealthy Producers</Typography>\n      <Table>\n        <TableHead><TableRow><TableCell>Rank</TableCell><TableCell>Name</TableCell><TableCell>Wealth (Cr)</TableCell><TableCell>Change</TableCell></TableRow></TableHead>\n        <TableBody>\n          {sorted.map((p, idx) => (\n            <TableRow key={p.name}>\n              <TableCell>{p.rank}</TableCell>\n              <TableCell>{p.name}</TableCell>\n              <TableCell>{p.wealth}</TableCell>\n              <TableCell>{p.rank < p.previousRank ? <ArrowDropUpIcon color="success" /> : p.rank > p.previousRank ? <ArrowDropDownIcon color="error" /> : ''}</TableCell>\n            </TableRow>\n          ))}\n        </TableBody>\n      </Table>\n    </TableContainer>\n  );\n};\nexport default ProducerList;
+import React from 'react';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+
+const ProducerList = ({ producers, previousRanks }) => {
+  return (
+    <div>
+      <h1>Producers List</h1>
+      <ul>
+        {producers.map((producer, index) => {
+          const previousRank = previousRanks[producer.id];
+          const rankChange = previousRank ? previousRank - (index + 1) : 0;
+
+          return (
+            <li key={producer.id}>
+              {producer.name} - ₹{producer.wealth.toLocaleString()}
+              {rankChange > 0 && <ArrowUpward color="success" />}
+              {rankChange < 0 && <ArrowDownward color="error" />}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+export default ProducerList;
