@@ -21,11 +21,11 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Create Sidebar.js
-        if: "!exists('src/components/Sidebar.js')"
+      - name: Create Sidebar.js (only if not exists)
         run: |
           mkdir -p src/components
-          cat << 'EOF' > src/components/Sidebar.js
+          if [ ! -f src/components/Sidebar.js ]; then
+            cat << 'EOF' > src/components/Sidebar.js
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -44,12 +44,13 @@ const Sidebar = () => {
 
 export default Sidebar;
 EOF
+          fi
 
-      - name: Create WinnerReveal.js
-        if: "!exists('src/features/oscars/WinnerReveal.js')"
+      - name: Create WinnerReveal.js (only if not exists)
         run: |
           mkdir -p src/features/oscars
-          cat << 'EOF' > src/features/oscars/WinnerReveal.js
+          if [ ! -f src/features/oscars/WinnerReveal.js ]; then
+            cat << 'EOF' > src/features/oscars/WinnerReveal.js
 import React, { useState } from "react";
 import { Fade } from "@mui/material";
 
@@ -70,12 +71,13 @@ const WinnerReveal = ({ winner }) => {
 
 export default WinnerReveal;
 EOF
+          fi
 
-      - name: Create ProducerList.js
-        if: "!exists('src/features/producers/ProducerList.js')"
+      - name: Create ProducerList.js (only if not exists)
         run: |
           mkdir -p src/features/producers
-          cat << 'EOF' > src/features/producers/ProducerList.js
+          if [ ! -f src/features/producers/ProducerList.js ]; then
+            cat << 'EOF' > src/features/producers/ProducerList.js
 import React from "react";
 
 const ProducerList = ({ producers }) => {
@@ -95,12 +97,13 @@ const ProducerList = ({ producers }) => {
 
 export default ProducerList;
 EOF
+          fi
 
-      - name: Create NewsFeed.js
-        if: "!exists('src/features/news/NewsFeed.js')"
+      - name: Create NewsFeed.js (only if not exists)
         run: |
           mkdir -p src/features/news
-          cat << 'EOF' > src/features/news/NewsFeed.js
+          if [ ! -f src/features/news/NewsFeed.js ]; then
+            cat << 'EOF' > src/features/news/NewsFeed.js
 import React from "react";
 import { Slide } from "@mui/material";
 
@@ -123,9 +126,10 @@ const NewsFeed = ({ news }) => {
 
 export default NewsFeed;
 EOF
+          fi
 
-      - name: Install peer dependencies (e.g. react-router-dom)
+      - name: Install peer dependencies
         run: yarn add react-router-dom @mui/material @emotion/react @emotion/styled
 
-      - name: Build project
+      - name: Build the app
         run: yarn run build
