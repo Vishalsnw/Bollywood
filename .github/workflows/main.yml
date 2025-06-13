@@ -1,30 +1,40 @@
-name: Yarn React Build
+name: Auto Update Bollywood App UI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
-  build:
+  update-ui:
     runs-on: ubuntu-latest
 
     steps:
-      - name: ⬇️ Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🟢 Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
 
-      - name: 📦 Install Dependencies using Yarn
-        run: yarn install
+      - name: Update UI files with enhanced layout and features
+        run: |
+          echo "// New Sidebar with added menus" > src/components/Sidebar.js
+          echo "import React from 'react';\nimport { Drawer, List, ListItem, ListItemText } from '@mui/material';\nimport { Link } from 'react-router-dom';\nconst Sidebar = () => (\n  <Drawer variant=\"permanent\">\n    <List>\n      <ListItem button component={Link} to=\"/movies\"><ListItemText primary=\"Movies\" /></ListItem>\n      <ListItem button component={Link} to=\"/producers\"><ListItemText primary=\"Producers\" /></ListItem>\n      <ListItem button component={Link} to=\"/nominations\"><ListItemText primary=\"Oscar Nominations\" /></ListItem>\n      <ListItem button component={Link} to=\"/winners\"><ListItemText primary=\"Oscar Winners\" /></ListItem>\n      <ListItem button component={Link} to=\"/news\"><ListItemText primary=\"News\" /></ListItem>\n    </List>\n  </Drawer>\n);\nexport default Sidebar;" >> src/components/Sidebar.js
 
-      - name: ⚙️ Build the React App
-        run: yarn build
+          echo "// Animated Winner Reveal & Dashboard structure" > src/features/oscars/WinnerReveal.js
+          echo "import React, { useState } from 'react';\nimport { Button, Typography, Fade } from '@mui/material';\nconst WinnerReveal = () => {\n  const [show, setShow] = useState(false);\n  return (\n    <div>\n      <Typography variant=\"h4\">Oscar Nominations</Typography>\n      <Button onClick={() => setShow(true)}>Reveal Winners</Button>\n      <Fade in={show}><div><Typography variant=\"h5\">🏆 Best Actor: John Doe</Typography></div></Fade>\n    </div>\n  );\n};\nexport default WinnerReveal;" >> src/features/oscars/WinnerReveal.js
 
-      - name: ✅ Done
-        run: echo "Build completed successfully!"u
+          echo "// Updated NewsFeed with animations" > src/features/news/NewsFeed.js
+          echo "import React from 'react';\nimport { Card, CardContent, Typography, Slide } from '@mui/material';\nconst news = [\n  '🎬 Producer X took ₹400 Cr loan for a flop movie!',\n  '🔻 Producer Y declared bankruptcy!',\n  '🔥 Oscar night drama: unexpected winners!'\n];\nconst NewsFeed = () => (\n  <div>{news.map((n, i) => (\n    <Slide direction=\"up\" in={true} timeout={500 + i * 300} key={i}><Card style={{margin: 10}}><CardContent><Typography>{n}</Typography></CardContent></Card></Slide>\n  ))}</div>\n);\nexport default NewsFeed;" >> src/features/news/NewsFeed.js
+
+          echo "// Updated App with Routes and Layout" > src/App.js
+          echo "import React from 'react';\nimport { BrowserRouter as Router, Route, Routes } from 'react-router-dom';\nimport Sidebar from './components/Sidebar';\nimport MovieList from './features/movies/MovieList';\nimport ProducerList from './features/producers/ProducerList';\nimport WinnerReveal from './features/oscars/WinnerReveal';\nimport NewsFeed from './features/news/NewsFeed';\nconst App = () => (\n  <Router>\n    <div style={{ display: 'flex' }}>\n      <Sidebar />\n      <div style={{ marginLeft: 240, padding: 20 }}>\n        <Routes>\n          <Route path=\"/movies\" element={<MovieList />} />\n          <Route path=\"/producers\" element={<ProducerList />} />\n          <Route path=\"/nominations\" element={<div>Oscar Nominations Placeholder</div>} />\n          <Route path=\"/winners\" element={<WinnerReveal />} />\n          <Route path=\"/news\" element={<NewsFeed />} />\n        </Routes>\n      </div>\n    </div>\n  </Router>\n);\nexport default App;" >> src/App.js
+
+      - name: Commit and push updated code
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add src/components/Sidebar.js src/features/oscars/WinnerReveal.js src/features/news/NewsFeed.js src/App.js
+          git commit -m "Auto: UI enhanced with sidebar, animation, news, routes"
+          git push
+          
