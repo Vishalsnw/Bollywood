@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 const WinnerReveal = ({ nominations = [], winners = [] }) => {
   const [showWinners, setShowWinners] = useState(false);
 
-  if (nominations.length === 0) {
+  if (nominations.length === 0 && winners.length === 0) {
     return (
       <div>
         <h1>Oscar Nominations</h1>
-        <p>No nominations available.</p>
+        <p>No nominations or winners available.</p>
       </div>
     );
   }
@@ -22,7 +22,7 @@ const WinnerReveal = ({ nominations = [], winners = [] }) => {
         ))}
       </ul>
       <button onClick={() => setShowWinners(true)}>Reveal Winners</button>
-      {showWinners && winners.length > 0 && (
+      {showWinners && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -36,7 +36,6 @@ const WinnerReveal = ({ nominations = [], winners = [] }) => {
           </ul>
         </motion.div>
       )}
-      {showWinners && winners.length === 0 && <p>No winners declared yet.</p>}
     </div>
   );
 };
