@@ -2,7 +2,11 @@ import React from 'react';
 import { Grid, Typography, Button } from '@mui/material';
 import { motion } from 'framer-motion';
 
-const GameScreen = ({ producers, year }) => {
+const GameScreen = ({ producers = [], year = 2025 }) => {
+  if (producers.length === 0) {
+    return <Typography variant="h6">No producers available for the year {year}.</Typography>;
+  }
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
