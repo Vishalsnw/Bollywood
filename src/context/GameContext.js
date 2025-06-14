@@ -4,8 +4,7 @@ import {
   advanceMonth, 
   advanceYear, 
   startOscarNominations, 
-  revealOscarWinner,
-  signActor
+  revealOscarWinner
 } from "../features/game/gameSlice";
 
 // Create context
@@ -40,7 +39,6 @@ export const GameProvider = ({ children }) => {
   const handleAdvanceYear = () => dispatch(advanceYear());
   const handleStartOscarNominations = () => dispatch(startOscarNominations());
   const handleRevealOscarWinner = () => dispatch(revealOscarWinner());
-  const handleSignActor = (actorId, producerId) => dispatch(signActor({ actorId, producerId }));
 
   const value = {
     loading,
@@ -62,8 +60,7 @@ export const GameProvider = ({ children }) => {
     advanceMonth: handleAdvanceMonth,
     advanceYear: handleAdvanceYear,
     startOscarNominations: handleStartOscarNominations,
-    revealOscarWinner: handleRevealOscarWinner,
-    signActor: handleSignActor
+    revealOscarWinner: handleRevealOscarWinner
   };
 
   return (
