@@ -1,133 +1,50 @@
-name: Bollywood App Enhancements
+name: Diagnose Blank Screen
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  enhance-ui:
+  diagnose:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
-      - name: Add Sidebar if not exists
-        run: |
-          mkdir -p src/components
-          if [ ! -f src/components/Sidebar.js ]; then
-cat <<'EOF' > src/components/Sidebar.js
-import React from 'react';
-import { Link } from 'react-router-dom';
+      - name: Run build
+        run: npm run build
 
-const Sidebar = () => {
-  return (
-    <aside style={{ width: '200px', padding: '20px', background: '#eee' }}>
-      <h3>Menu</h3>
-      <ul>
-        <li><Link to='/nominations'>Oscar Nominations</Link></li>
-        <li><Link to='/winners'>Oscar Winners</Link></li>
-        <li><Link to='/producers'>Producers</Link></li>
-      </ul>
-    </aside>
-  );
-};
+      - name: Run tests (if available)
+        run: npm test || echo "No tests found"
 
-export default Sidebar;
-EOF
-          fi
+      - name: Upload build artifacts
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            build
+            npm-debug.log
+            .next
+            dist
 
-      - name: Add WinnerReveal if not exists
-        run: |
-          mkdir -p src/features/oscars
-          if [ ! -f src/features/oscars/WinnerReveal.js ]; then
-cat <<'EOF' > src/features/oscars/WinnerReveal.js
-import React, { useState } from 'react';
-import { Fade } from '@mui/material';
-
-const WinnerReveal = ({ winner }) => {
-  const [show, setShow] = useState(false);
-
-  return (
-    <div style={{ marginTop: '20px' }}>
-      <button onClick={() => setShow(true)}>Reveal Winner</button>
-      <Fade in={show}>
-        <div><h2 style={{ color: 'green' }}>{winner}</h2></div>
-      </Fade>
-    </div>
-  );
-};
-
-export default WinnerReveal;
-EOF
-          fi
-
-      - name: Add ProducerList if not exists
-        run: |
-          mkdir -p src/features/producers
-          if [ ! -f src/features/producers/ProducerList.js ]; then
-cat <<'EOF' > src/features/producers/ProducerList.js
-import React from 'react';
-
-const ProducerList = ({ producers }) => {
-  const sorted = [...producers].sort((a, b) => b.wealth - a.wealth);
-
-  return (
-    <ul>
-      {sorted.map((p, index) => (
-        <li key={p.name}>
-          #{index + 1} {p.name} - ₹{p.wealth} Cr
-          {p.rankChange > 0 ? ' 🔼' : p.rankChange < 0 ? ' 🔽' : ''}
-        </li>
-      ))}
-    </ul>
-  );
-};
-
-export default ProducerList;
-EOF
-          fi
-
-      - name: Add NewsFeed if not exists
-        run: |
-          mkdir -p src/features/news
-          if [ ! -f src/features/news/NewsFeed.js ]; then
-cat <<'EOF' > src/features/news/NewsFeed.js
-import React from 'react';
-import { Slide } from '@mui/material';
-
-const NewsFeed = ({ news }) => {
-  return (
-    <div>
-      <h2>Breaking News</h2>
-      {news.map((item, idx) => (
-        <Slide direction='up' in={true} mountOnEnter unmountOnExit key={idx}>
-          <div style={{ background: '#fff3e0', padding: '10px', margin: '10px 0' }}>
-            📰 {item.headline}
-            {item.type === 'loan' && <span> 💸 Took a loan</span>}
-            {item.type === 'bankrupt' && <span> 🚨 Bankrupt!</span>}
-          </div>
-        </Slide>
-      ))}
-    </div>
-  );
-};
-
-export default NewsFeed;
-EOF
-          fi
-
-      - name: Ensure UI dependencies are installed
-        run: yarn add react-router-dom @mui/material @emotion/react @emotion/styled
-
-      - name: Build App
-        run: yarn run build
+      - name: Upload logs if build fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: |
+            npm-debug.log
+            .npm/_logs
