@@ -48,11 +48,11 @@ const GameScreen = () => {
   const [selectedProducer, setSelectedProducer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Sort producers by wealth
-  const sortedProducers = [...producers].sort((a, b) => b.wealth - a.wealth);
+  // Sort producers by wealth (safe copy)
+  const sortedProducers = [...(producers || [])].sort((a, b) => b.wealth - a.wealth);
   
   // Get user's producer
-  const userProducer = producers.find(p => p.id === userSelectedProducer);
+  const userProducer = (producers || []).find(p => p.id === userSelectedProducer);
   
   // Get month name
   const monthNames = [
@@ -62,7 +62,7 @@ const GameScreen = () => {
   
   const steps = ['Production Phase', 'Oscar Nominations', 'Oscar Winner'];
   const activeStep = gamePhase === 'production' ? 0 : gamePhase === 'oscars' ? 1 : 2;
-  
+
   const handleProducerClick = (producer) => {
     if (gamePhase === 'production') {
       setSelectedProducer(producer);
@@ -94,7 +94,6 @@ const GameScreen = () => {
           <Typography variant="h4" fontWeight="bold">
             Bollywood Tycoon
           </Typography>
-          
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="h5">
               {monthNames[month-1]} {year}
@@ -222,8 +221,8 @@ const GameScreen = () => {
                 <Typography variant="subtitle1" gutterBottom>
                   Current Genre Popularity
                 </Typography>
-                
-                {marketTrends.sort((a, b) => b.popularity - a.popularity).map((trend) => (
+                {/* FIX: Sort a copy, not the original */}
+                {[...(marketTrends || [])].sort((a, b) => b.popularity - a.popularity).map((trend) => (
                   <Box key={trend.genre} sx={{ mb: 1.5 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                       <Typography variant="body2">
@@ -254,38 +253,38 @@ const GameScreen = () => {
                   Movies in trending genres perform better at the box office.
                 </Typography>
               </Paper>
-              
-              <Box sx={{ mt: 3 }}>
-                <Typography variant="h6" gutterBottom>Release Calendar</Typography>
-                <Paper elevation={2} sx={{ p: 2 }}>
-                  <Typography variant="subtitle2" gutterBottom>
-                    Upcoming releases this month:
-                  </Typography>
-                  
-                  {producers.flatMap(p => p.movies)
-                    .filter(m => m.year === year && m.month === month)
-                    .length > 0 ? (
-                      producers.flatMap(p => p.movies)
-                        .filter(m => m.year === year && m.month === month)
-                        .map(movie => (
-                          <Box key={movie.id} sx={{ mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
-                            <Typography variant="body2">
-                              {movie.title} - {movie.producerName}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {movie.genre} • Budget: ₹{movie.budget}
-                            </Typography>
-                          </Box>
-                        ))
-                    ) : (
-                      <Typography variant="body2" color="text.secondary">
-                        No movies scheduled for release this month.
-                      </Typography>
-                    )}
-                </Paper>
-              </Box>
             </Grid>
           </Grid>
+          
+          <Box sx={{ mt: 3 }}>
+            <Typography variant="h6" gutterBottom>Release Calendar</Typography>
+            <Paper elevation={2} sx={{ p: 2 }}>
+              <Typography variant="subtitle2" gutterBottom>
+                Upcoming releases this month:
+              </Typography>
+              
+              {(producers || []).flatMap(p => p.movies)
+                .filter(m => m.year === year && m.month === month)
+                .length > 0 ? (
+                  (producers || []).flatMap(p => p.movies)
+                    .filter(m => m.year === year && m.month === month)
+                    .map(movie => (
+                      <Box key={movie.id} sx={{ mb: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
+                        <Typography variant="body2">
+                          {movie.title} - {movie.producerName}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {movie.genre} • Budget: ₹{movie.budget}
+                        </Typography>
+                      </Box>
+                    ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary">
+                    No movies scheduled for release this month.
+                  </Typography>
+                )}
+            </Paper>
+          </Box>
           
           {selectedProducer && (
             <MovieForm 
