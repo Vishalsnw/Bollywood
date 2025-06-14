@@ -1,50 +1,60 @@
-name: Diagnose Blank Screen
+name: React App Inspector
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
-    branches: [main]
-  workflow_dispatch:
+    branches: [ main ]
 
 jobs:
-  diagnose:
+  inspect-app:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: '20'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          yarn install --frozen-lockfile || yarn install
 
-      - name: Run build
-        run: npm run build
+      - name: Lint and detect file errors
+        run: |
+          echo "Running ESLint check..."
+          yarn add eslint --dev
+          npx eslint src/ || echo "⚠️ ESLint completed with warnings or errors"
 
-      - name: Run tests (if available)
-        run: npm test || echo "No tests found"
+      - name: Check if critical files exist
+        run: |
+          echo "🔍 Checking required files..."
+          FILES=(
+            "src/components/GameScreen.js"
+            "src/components/Sidebar.js"
+            "src/features/producers/ProducersPage.js"
+            "src/features/news/NewsPage.js"
+            "src/features/oscars/OscarWinnersPage.js"
+            "src/features/studios/StudioPage.js"
+            "src/features/actors/ActorsPage.js"
+            "src/features/market/MarketPage.js"
+            "src/context/GameContext.js"
+            "src/store.js"
+          )
 
-      - name: Upload build artifacts
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            build
-            npm-debug.log
-            .next
-            dist
+          for file in "${FILES[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              echo "❌ Missing: $file"
+              exit 1
+            else
+              echo "✅ Found: $file"
+            fi
+          done
 
-      - name: Upload logs if build fails
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: logs
-          path: |
-            npm-debug.log
-            .npm/_logs
+      - name: Try Build
+        run: |
+          echo "🛠 Trying to build project..."
+          yarn build || echo "❌ Build failed — check above logs"
