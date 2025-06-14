@@ -8,20 +8,36 @@ import Sidebar from "./components/Sidebar";
 import ProducersPage from "./features/producers/ProducersPage";
 import NewsPage from "./features/news/NewsPage";
 import OscarWinnersPage from "./features/oscars/OscarWinnersPage";
-import { Box, IconButton } from "@mui/material";
+import StudioPage from "./features/studios/StudioPage";
+import ActorsPage from "./features/actors/ActorsPage";
+import MarketPage from "./features/market/MarketPage";
+import { Box, IconButton, AppBar, Toolbar, Typography } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { GameProvider } from "./context/GameContext";
 
 // MUI Theme
 const theme = createTheme({
   palette: {
     primary: { main: "#1976d2" },
     secondary: { main: "#ff9100" },
-    background: { default: "#fafafa" },
+    background: { default: "#f5f5f5" },
     success: { main: "#43a047" },
+    error: { main: "#d32f2f" },
+    info: { main: "#0288d1" },
+    warning: { main: "#ed6c02" },
   },
   shape: { borderRadius: 12 },
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
+    h4: {
+      fontWeight: 600,
+    },
+    h5: {
+      fontWeight: 600,
+    },
+    h6: {
+      fontWeight: 600,
+    },
   },
   components: {
     MuiButton: {
@@ -29,6 +45,21 @@ const theme = createTheme({
         root: {
           textTransform: "none",
           fontWeight: 600,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          overflow: 'hidden',
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
         },
       },
     },
@@ -42,43 +73,64 @@ function App() {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const producers = [
-    "Golu", "Amit Bagle", "Mangesh", "Vasim", "Amit Randhe", "Khushi", "Ajinkya", "Vinay",
-    "Aashish", "Ashok Singh", "Sandip Basra", "Gokul", "Ritesh", "Bipin", "Ajit Bonde", "Amol Patil",
-    "Hemant", "Ravi Patil", "Sachin Pardesi", "Sachin Patil", "Vishal", "Nitin", "Dipak Trivedi",
-    "Sunil", "Charu", "Bhavesh Chaudhari", "Dipak R", "Mayur", "Nilesh", "Dipak BH", "Sunil"
-  ].map((name, id) => ({ id, name, wealth: Math.floor(Math.random() * 500) + 500 }));
+  // Current date and time display
+  const currentDate = "2025-06-14 08:26:11";
+  const formattedDate = new Date(currentDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Router>
-          <Box sx={{ display: "flex" }}>
-            <Box sx={{ position: "fixed", top: 10, left: 10, zIndex: 1100 }}>
-              <IconButton 
-                color="primary" 
-                onClick={toggleSidebar}
-                size="large"
-                edge="start"
-                aria-label="menu"
-              >
-                <MenuIcon />
-              </IconButton>
+        <GameProvider>
+          <Router>
+            <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+              <AppBar position="fixed" color="primary" elevation={0}>
+                <Toolbar>
+                  <IconButton 
+                    color="inherit" 
+                    onClick={toggleSidebar}
+                    size="large"
+                    edge="start"
+                    aria-label="menu"
+                    sx={{ mr: 2 }}
+                  >
+                    <MenuIcon />
+                  </IconButton>
+                  
+                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                    Bollywood Tycoon
+                  </Typography>
+                  
+                  <Typography variant="body2" sx={{ mr: 2 }}>
+                    {formattedDate}
+                  </Typography>
+                  
+                  <Typography variant="body2">
+                    User: Vishalsnw
+                  </Typography>
+                </Toolbar>
+              </AppBar>
+              
+              <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
+              
+              <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
+                <Routes>
+                  <Route path="/" element={<GameScreen />} />
+                  <Route path="/producers" element={<ProducersPage />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/oscars/winners" element={<OscarWinnersPage />} />
+                  <Route path="/studios" element={<StudioPage />} />
+                  <Route path="/actors" element={<ActorsPage />} />
+                  <Route path="/market" element={<MarketPage />} />
+                </Routes>
+              </Box>
             </Box>
-            
-            <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
-            
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-              <Routes>
-                <Route path="/" element={<GameScreen producers={producers} />} />
-                <Route path="/producers" element={<ProducersPage producers={producers} />} />
-                <Route path="/news" element={<NewsPage />} />
-                <Route path="/oscars/winners" element={<OscarWinnersPage />} />
-              </Routes>
-            </Box>
-          </Box>
-        </Router>
+          </Router>
+        </GameProvider>
       </ThemeProvider>
     </Provider>
   );
