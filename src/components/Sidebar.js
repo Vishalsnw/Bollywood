@@ -61,7 +61,6 @@ const Sidebar = ({ open, toggleSidebar }) => {
       <List>
         {menuItems.map((item) => (
           <ListItem 
-            button 
             key={item.path} 
             component={Link} 
             to={item.path}
