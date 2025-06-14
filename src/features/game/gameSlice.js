@@ -1,13 +1,9 @@
-// src/features/game/gameSlice.js
-
-import { createSlice } from '@reduxjs/toolkit';
-import { initializeProducers } from '../producers/producerUtils';
-import { playYear } from './gameLogic';
-import { loadState, saveState } from '../storage/localStorage';
+import { createSlice } from "@reduxjs/toolkit";
+import { saveState, loadState } from "../storage/localStorage";
 
 const initialState = loadState() || {
   year: 2025,
-  producers: initializeProducers(),
+  producers: [],
   movies: [],
   oscars: [],
   news: [],
@@ -16,42 +12,24 @@ const initialState = loadState() || {
 };
 
 const gameSlice = createSlice({
-  name: 'game',
+  name: "game",
   initialState,
   reducers: {
     startGame(state) {
       state.running = true;
+      saveState(state); // Save state when the game starts
     },
     playNextYear(state) {
-      const { movies, oscars, news, producers } = playYear(state);
-      state.movies.push(...movies);
-      state.oscars.push(oscars);
-      state.news.push(...news);
-      state.producers = producers;
+      // Example logic for progressing the game
       state.year += 1;
-      saveState(state); // Persist after every year
-    },
-    resetGame(state) {
-      Object.assign(state, {
-        ...initialState,
-        producers: initializeProducers(),
-        movies: [],
-        oscars: [],
-        news: [],
-        gameStats: {},
-        year: 2025,
-        running: false,
-      });
       saveState(state);
     },
-    loadGame(state, action) {
-      // Load state from saved game
-      Object.assign(state, action.payload);
+    resetGame(state) {
+      Object.assign(state, initialState);
+      saveState(state);
     },
   },
 });
 
-export const { startGame, playNextYear, resetGame, loadGame } = gameSlice.actions;
+export const { startGame, playNextYear, resetGame } = gameSlice.actions;
 export default gameSlice.reducer;
-
-// end of code
