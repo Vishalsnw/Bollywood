@@ -1,126 +1,304 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Box, 
-  Paper, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow,
+import React, { useState } from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
   Button,
-  ButtonGroup,
-  Divider
-} from '@mui/material';
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+  Divider,
+  Avatar,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
+} from "@mui/material";
+import { useGameContext } from "../../context/GameContext";
+import MovieIcon from '@mui/icons-material/Movie';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import StarsIcon from '@mui/icons-material/Stars';
+import PeopleIcon from '@mui/icons-material/People';
 
-const ProducersPage = ({ producers: initialProducers = [] }) => {
-  const [producers, setProducers] = useState(initialProducers);
-  const [sortOrder, setSortOrder] = useState('wealth-desc');
-
-  useEffect(() => {
-    // Sort producers based on current sort order
-    sortProducers(sortOrder);
-  }, []);
-
-  const sortProducers = (order) => {
-    let sortedList = [...producers];
-    
-    switch(order) {
-      case 'wealth-desc':
-        sortedList.sort((a, b) => b.wealth - a.wealth);
-        break;
-      case 'wealth-asc':
-        sortedList.sort((a, b) => a.wealth - b.wealth);
-        break;
-      case 'name-asc':
-        sortedList.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        sortedList.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      default:
-        sortedList.sort((a, b) => b.wealth - a.wealth);
-    }
-    
-    setProducers(sortedList);
-    setSortOrder(order);
+const ProducersPage = () => {
+  const { producers, userSelectedProducer } = useGameContext();
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  
+  // Sort producers by wealth
+  const sortedProducers = [...producers].sort((a, b) => b.wealth - a.wealth);
+  
+  const handleMovieClick = (movie) => {
+    setSelectedMovie(movie);
   };
-
+  
+  const handleCloseDialog = () => {
+    setSelectedMovie(null);
+  };
+  
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
-      <Paper elevation={3} sx={{ p: 3 }}>
+    <Box sx={{ padding: "20px" }}>
+      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Producers Rankings
+          Bollywood Producers
         </Typography>
-        <Divider sx={{ mb: 3 }} />
-        
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" gutterBottom>
-            Sort by:
-          </Typography>
-          <ButtonGroup variant="outlined" aria-label="sorting options">
-            <Button 
-              onClick={() => sortProducers('wealth-desc')} 
-              variant={sortOrder === 'wealth-desc' ? 'contained' : 'outlined'}
-              endIcon={<ArrowDownward />}
-            >
-              Wealth High-Low
-            </Button>
-            <Button 
-              onClick={() => sortProducers('wealth-asc')} 
-              variant={sortOrder === 'wealth-asc' ? 'contained' : 'outlined'}
-              endIcon={<ArrowUpward />}
-            >
-              Wealth Low-High
-            </Button>
-            <Button 
-              onClick={() => sortProducers('name-asc')} 
-              variant={sortOrder === 'name-asc' ? 'contained' : 'outlined'}
-            >
-              Name A-Z
-            </Button>
-            <Button 
-              onClick={() => sortProducers('name-desc')} 
-              variant={sortOrder === 'name-desc' ? 'contained' : 'outlined'}
-            >
-              Name Z-A
-            </Button>
-          </ButtonGroup>
-        </Box>
-
-        <TableContainer component={Paper} elevation={1}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ bgcolor: 'primary.light' }}>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>Rank</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }}>Producer Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold', color: 'white' }} align="right">Wealth (₹)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {producers.map((producer, index) => (
-                <TableRow 
-                  key={producer.id}
-                  sx={{ 
-                    '&:nth-of-type(odd)': { backgroundColor: 'action.hover' },
-                    bgcolor: index < 3 ? 'rgba(255, 215, 0, 0.1)' : undefined // Highlight top 3
-                  }}
-                >
-                  <TableCell component="th" scope="row">
-                    {index + 1}{index === 0 && " 👑"}
-                  </TableCell>
-                  <TableCell>{producer.name}</TableCell>
-                  <TableCell align="right">{producer.wealth.toLocaleString()}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <Typography variant="body1">
+          View details about all production companies in the industry, their financial status, and filmography.
+        </Typography>
       </Paper>
-    </Container>
+      
+      <Grid container spacing={4}>
+        {sortedProducers.map((producer, index) => (
+          <Grid item xs={12} key={producer.id}>
+            <Card 
+              elevation={producer.id === userSelectedProducer ? 3 : 1}
+              sx={{ 
+                borderRadius: 2,
+                border: producer.id === userSelectedProducer ? '2px solid' : 'none',
+                borderColor: 'primary.main'
+              }}
+            >
+              <CardContent>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={4}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                      <Avatar 
+                        sx={{ 
+                          bgcolor: producer.color || 'primary.main', 
+                          width: 60, 
+                          height: 60,
+                          mr: 2
+                        }}
+                      >
+                        {producer.name.charAt(0)}
+                      </Avatar>
+                      <Box>
+                        <Typography variant="h5">
+                          {producer.name}
+                        </Typography>
+                        {producer.id === userSelectedProducer && (
+                          <Chip label="YOUR COMPANY" color="primary" size="small" sx={{ mt: 0.5 }} />
+                        )}
+                      </Box>
+                    </Box>
+                    
+                    <Box sx={{ mt: 3 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <MonetizationOnIcon sx={{ color: 'success.main', mr: 1 }} />
+                        <Typography variant="body1">
+                          Wealth: ₹{producer.wealth.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <StarsIcon sx={{ color: 'warning.main', mr: 1 }} />
+                        <Typography variant="body1">
+                          Reputation: {producer.reputation}/100
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                        <PeopleIcon sx={{ color: 'info.main', mr: 1 }} />
+                        <Typography variant="body1">
+                          Fans: {(producer.fans / 1000).toFixed(1)}K
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <MovieIcon sx={{ color: 'secondary.main', mr: 1 }} />
+                        <Typography variant="body1">
+                          Movies Produced: {producer.movies.length}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={8}>
+                    <Typography variant="h6" gutterBottom>
+                      Filmography
+                    </Typography>
+                    
+                    {producer.movies.length > 0 ? (
+                      <TableContainer component={Paper} variant="outlined">
+                        <Table size="small">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Title</TableCell>
+                              <TableCell>Genre</TableCell>
+                              <TableCell>Year</TableCell>
+                              <TableCell align="right">Budget</TableCell>
+                              <TableCell align="right">Box Office</TableCell>
+                              <TableCell align="right">Profit</TableCell>
+                              <TableCell align="right">Score</TableCell>
+                              <TableCell align="right">Actions</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {producer.movies.map((movie) => (
+                              <TableRow key={movie.id}>
+                                <TableCell>{movie.title}</TableCell>
+                                <TableCell>{movie.genre}</TableCell>
+                                <TableCell>{movie.year}</TableCell>
+                                <TableCell align="right">₹{(movie.budget / 1000000).toFixed(1)}M</TableCell>
+                                <TableCell align="right">₹{(movie.boxOffice / 1000000).toFixed(1)}M</TableCell>
+                                <TableCell 
+                                  align="right"
+                                  sx={{ 
+                                    color: movie.profit > 0 ? 'success.main' : 'error.main'
+                                  }}
+                                >
+                                  {movie.profit > 0 ? '+' : ''}₹{(movie.profit / 1000000).toFixed(1)}M
+                                </TableCell>
+                                <TableCell align="right">{movie.audienceScore}/100</TableCell>
+                                <TableCell align="right">
+                                  <Button 
+                                    size="small" 
+                                    onClick={() => handleMovieClick(movie)}
+                                  >
+                                    Details
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        No movies produced yet.
+                      </Typography>
+                    )}
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+      
+      {/* Movie Details Dialog */}
+      <Dialog open={!!selectedMovie} onClose={handleCloseDialog} maxWidth="md" fullWidth>
+        {selectedMovie && (
+          <>
+            <DialogTitle>
+              {selectedMovie.title}
+            </DialogTitle>
+            
+            <DialogContent dividers>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Producer: {selectedMovie.producerName}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Released: Year {selectedMovie.year}, Month {selectedMovie.month}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Genre: {selectedMovie.genre}
+                  </Typography>
+                  <Typography variant="body1" gutterBottom>
+                    Starring: {selectedMovie.actorName}
+                  </Typography>
+                  {selectedMovie.directorName && (
+                    <Typography variant="body1" gutterBottom>
+                      Director: {selectedMovie.directorName}
+                    </Typography>
+                  )}
+                  <Typography variant="body1" gutterBottom>
+                    Studio: {selectedMovie.studioName || "Standard Studio"}
+                  </Typography>
+                </Grid>
+                
+                <Grid item xs={12} sm={6}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Financial Performance
+                  </Typography>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Budget:
+                    </Typography>
+                    <Typography variant="h6">
+                      ₹{selectedMovie.budget.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Box Office:
+                    </Typography>
+                    <Typography variant="h6">
+                      ₹{selectedMovie.boxOffice.toLocaleString()}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Profit/Loss:
+                    </Typography>
+                    <Typography 
+                      variant="h6" 
+                      sx={{ 
+                        color: selectedMovie.profit > 0 ? 'success.main' : 'error.main'
+                      }}
+                    >
+                      {selectedMovie.profit > 0 ? '+' : ''}₹{selectedMovie.profit.toLocaleString()}
+                      <Typography variant="caption" sx={{ ml: 1 }}>
+                        ({Math.round((selectedMovie.profit / selectedMovie.budget) * 100)}% ROI)
+                      </Typography>
+                    </Typography>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12}>
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="subtitle1" gutterBottom>
+                    Audience Score: {selectedMovie.audienceScore}/100
+                  </Typography>
+                  <Box sx={{ width: '100%', bgcolor: 'grey.300', height: 10, borderRadius: 5, mb: 2 }}>
+                    <Box 
+                      sx={{ 
+                        width: `${selectedMovie.audienceScore}%`, 
+                        bgcolor: selectedMovie.audienceScore > 70 ? 'success.main' : 
+                                selectedMovie.audienceScore > 50 ? 'warning.main' : 'error.main',
+                        height: '100%',
+                        borderRadius: 5
+                      }} 
+                    />
+                  </Box>
+                  
+                  {selectedMovie.awards && selectedMovie.awards.length > 0 && (
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Awards:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selectedMovie.awards.map((award, index) => (
+                          <Chip 
+                            key={index} 
+                            label={award.name} 
+                            color="secondary" 
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Grid>
+              </Grid>
+            </DialogContent>
+            
+            <DialogActions>
+              <Button onClick={handleCloseDialog}>
+                Close
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+    </Box>
   );
 };
 
