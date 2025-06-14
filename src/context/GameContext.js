@@ -5,7 +5,6 @@ import {
   advanceYear, 
   startOscarNominations, 
   revealOscarWinner,
-  rentStudio,
   signActor
 } from "../features/game/gameSlice";
 
@@ -19,7 +18,6 @@ export const useGameContext = () => useContext(GameContext);
 export const GameProvider = ({ children }) => {
   const dispatch = useDispatch();
   const {
-    // These selectors will match your new slice structure; update if your state shape changes
     loading,
     error,
     currentUser,
@@ -38,37 +36,12 @@ export const GameProvider = ({ children }) => {
     oscarWinner
   } = useSelector(state => state.game);
 
-  // Handle advancing to the next month
-  const handleAdvanceMonth = () => {
-    dispatch(advanceMonth());
-  };
+  const handleAdvanceMonth = () => dispatch(advanceMonth());
+  const handleAdvanceYear = () => dispatch(advanceYear());
+  const handleStartOscarNominations = () => dispatch(startOscarNominations());
+  const handleRevealOscarWinner = () => dispatch(revealOscarWinner());
+  const handleSignActor = (actorId, producerId) => dispatch(signActor({ actorId, producerId }));
 
-  // Handle advancing to the next year
-  const handleAdvanceYear = () => {
-    dispatch(advanceYear());
-  };
-
-  // Handle starting Oscar nominations
-  const handleStartOscarNominations = () => {
-    dispatch(startOscarNominations());
-  };
-
-  // Handle revealing Oscar winner
-  const handleRevealOscarWinner = () => {
-    dispatch(revealOscarWinner());
-  };
-
-  // Handle studio rental
-  const handleRentStudio = (studioId, producerId) => {
-    dispatch(rentStudio({ studioId, producerId }));
-  };
-
-  // Handle actor signing
-  const handleSignActor = (actorId, producerId) => {
-    dispatch(signActor({ actorId, producerId }));
-  };
-
-  // Value object to be provided to consumers
   const value = {
     loading,
     error,
@@ -90,7 +63,6 @@ export const GameProvider = ({ children }) => {
     advanceYear: handleAdvanceYear,
     startOscarNominations: handleStartOscarNominations,
     revealOscarWinner: handleRevealOscarWinner,
-    rentStudio: handleRentStudio,
     signActor: handleSignActor
   };
 
