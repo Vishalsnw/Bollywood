@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Provider } from "react-redux";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { CssBaseline, ThemeProvider, createTheme, Box, IconButton, AppBar, Toolbar, Typography } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+
 import store from "./store";
 import GameScreen from "./components/GameScreen";
 import Sidebar from "./components/Sidebar";
@@ -11,11 +13,8 @@ import OscarWinnersPage from "./features/oscars/OscarWinnersPage";
 import StudioPage from "./features/studios/StudioPage";
 import ActorsPage from "./features/actors/ActorsPage";
 import MarketPage from "./features/market/MarketPage";
-import { Box, IconButton, AppBar, Toolbar, Typography } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import { GameProvider } from "./context/GameContext";
 
-// MUI Theme
 const theme = createTheme({
   palette: {
     primary: { main: "#1976d2" },
@@ -55,16 +54,12 @@ const theme = createTheme({
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
-  // Debug log to confirm App component mounted
   useEffect(() => {
     console.log("App mounted");
   }, []);
 
-  // Current date and time display
   const currentDate = "2025-06-14 16:33:11";
   const formattedDate = new Date(currentDate).toLocaleDateString("en-US", {
     year: "numeric",
@@ -78,9 +73,7 @@ function App() {
         <CssBaseline />
         <GameProvider>
           <Router>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-            >
+            <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
               <AppBar position="fixed" color="primary" elevation={0}>
                 <Toolbar>
                   <IconButton
@@ -94,7 +87,7 @@ function App() {
                     <MenuIcon />
                   </IconButton>
 
-                  <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ flexGrow: 1 }}>
                     Bollywood Tycoon
                   </Typography>
 
@@ -106,10 +99,11 @@ function App() {
                 </Toolbar>
               </AppBar>
 
+              {/* Sidebar may need position fixed or related styling */}
               <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
 
               <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
-                <Routes>
+                <Routes> {/* Correct Routes and Route from react-router-dom v6 */}
                   <Route path="/" element={<GameScreen />} />
                   <Route path="/producers" element={<ProducersPage />} />
                   <Route path="/news" element={<NewsPage />} />
