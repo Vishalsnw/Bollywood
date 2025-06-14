@@ -1,207 +1,224 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Typography, Box, Paper, Divider, Button, Grid, Card, CardContent, CardActions, CardMedia } from '@mui/material';
-import { motion } from 'framer-motion';
-import WinnerReveal from './WinnerReveal';
+import React from "react";
+import {
+  Box,
+  Typography,
+  Paper,
+  Grid,
+  Card,
+  CardContent,
+  Divider,
+  Chip,
+  Avatar
+} from "@mui/material";
+import { useGameContext } from "../../context/GameContext";
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
 const OscarWinnersPage = () => {
-  const [showWinners, setShowWinners] = useState(false);
+  const { producers, year } = useGameContext();
   
-  const nominations = [
+  // Get all movies with Oscar awards
+  const oscarWinners = producers
+    .flatMap(producer => producer.movies)
+    .filter(movie => movie.awards && movie.awards.some(award => award.name.includes("Oscar")))
+    .sort((a, b) => {
+      // Find the Oscar award year for each movie
+      const aYear = a.awards.find(award => award.name.includes("Oscar"))?.year || 0;
+      const bYear = b.awards.find(award => award.name.includes("Oscar"))?.year || 0;
+      return bYear - aYear; // Sort by most recent first
+    });
+  
+  // Placeholder data if no real winners exist
+  const placeholderWinners = [
     {
-      id: 1,
-      title: "The Mumbai Story",
-      producerName: "Golu",
-      category: "Best Picture",
-      description: "A thrilling drama set in the bustling streets of Mumbai",
-      image: "https://source.unsplash.com/random/500x300/?bollywood,movie"
+      id: "placeholder1",
+      title: "The Golden Era",
+      producerName: "Vishal Productions",
+      year: 2024,
+      genre: "Historical Drama",
+      boxOffice: 350000000,
+      budget: 120000000,
+      profit: 230000000,
+      audienceScore: 92,
+      actorName: "Shah Rukh Khan",
+      directorName: "Karan Johar"
     },
     {
-      id: 2,
+      id: "placeholder2",
       title: "Eternal Love",
-      producerName: "Amit Bagle",
-      category: "Best Picture",
-      description: "A timeless romance that spans generations",
-      image: "https://source.unsplash.com/random/500x300/?romance,movie"
+      producerName: "Red Films",
+      year: 2023,
+      genre: "Romance",
+      boxOffice: 280000000,
+      budget: 90000000,
+      profit: 190000000,
+      audienceScore: 88,
+      actorName: "Deepika Padukone",
+      directorName: "Sanjay Leela Bhansali"
     },
     {
-      id: 3,
-      title: "Desert Storm",
-      producerName: "Mangesh",
-      category: "Best Picture",
-      description: "An action-packed adventure in the Rajasthan desert",
-      image: "https://source.unsplash.com/random/500x300/?desert,movie"
-    },
-    {
-      id: 4,
-      title: "The Last Song",
-      producerName: "Vasim",
-      category: "Best Picture",
-      description: "A musical journey that touches hearts",
-      image: "https://source.unsplash.com/random/500x300/?music,movie"
-    },
-    {
-      id: 5,
-      title: "Mountain Echoes",
-      producerName: "Ajinkya",
-      category: "Best Picture",
-      description: "A spiritual awakening in the Himalayas",
-      image: "https://source.unsplash.com/random/500x300/?mountains,movie"
+      id: "placeholder3",
+      title: "Mumbai Nights",
+      producerName: "Golden Pictures",
+      year: 2022,
+      genre: "Thriller",
+      boxOffice: 220000000,
+      budget: 85000000,
+      profit: 135000000,
+      audienceScore: 84,
+      actorName: "Ranbir Kapoor",
+      directorName: "Anurag Kashyap"
     }
   ];
   
-  const winners = [
-    {
-      id: 2,
-      title: "Eternal Love",
-      producerName: "Amit Bagle",
-      category: "Best Picture",
-      description: "A timeless romance that spans generations",
-      image: "https://source.unsplash.com/random/500x300/?romance,movie"
-    },
-    {
-      id: 1,
-      title: "The Mumbai Story",
-      producerName: "Golu",
-      category: "Best Director",
-      description: "For exceptional direction bringing Mumbai to life",
-      image: "https://source.unsplash.com/random/500x300/?director,movie"
-    },
-    {
-      id: 4,
-      title: "The Last Song",
-      producerName: "Vasim",
-      category: "Best Music",
-      description: "For soul-stirring melodies that define a generation",
-      image: "https://source.unsplash.com/random/500x300/?music,movie"
-    }
-  ];
-
+  // Use real winners if available, otherwise use placeholders
+  const displayWinners = oscarWinners.length > 0 ? oscarWinners : placeholderWinners;
+  
   return (
-    <Container maxWidth="lg" sx={{ mt: 5 }}>
+    <Box sx={{ padding: "20px" }}>
       <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h4" gutterBottom align="center">
-          2025 Bollywood Oscar Awards
+        <Typography variant="h4" gutterBottom>
+          Oscar Winners Hall of Fame
         </Typography>
-        <Divider sx={{ mb: 3 }} />
-        
-        <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-          Nominations
+        <Typography variant="body1">
+          Celebrating the best of Bollywood cinema throughout the years. These films have been recognized with the prestigious Best Picture Oscar award.
         </Typography>
-        
-        <Grid container spacing={3}>
-          {nominations.map((nom, index) => (
-            <Grid item xs={12} sm={6} md={4} key={nom.id}>
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Card elevation={2}>
-                  <CardMedia
-                    component="img"
-                    height="180"
-                    image={nom.image}
-                    alt={nom.title}
-                  />
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {nom.title}
-                    </Typography>
-                    <Typography variant="subtitle2" color="primary">
-                      Producer: {nom.producerName}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                      {nom.description}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ 
-                      display: 'inline-block', 
-                      bgcolor: 'action.hover', 
-                      px: 1, 
-                      py: 0.5, 
-                      borderRadius: 1,
-                      mt: 1
-                    }}>
-                      Nominated for: {nom.category}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
-        
-        <Box sx={{ textAlign: 'center', mt: 4 }}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
-            size="large"
-            onClick={() => setShowWinners(true)}
-            disabled={showWinners}
-          >
-            Reveal Winners
-          </Button>
-        </Box>
-        
-        {showWinners && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-          >
-            <Box sx={{ mt: 6 }}>
-              <Typography variant="h4" gutterBottom align="center" color="secondary">
-                🏆 And the winners are... 🏆
-              </Typography>
-              <Divider sx={{ mb: 4 }} />
-              
-              <Grid container spacing={3}>
-                {winners.map((winner, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={winner.id}>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.7, delay: index * 0.3 }}
-                    >
-                      <Card elevation={4} sx={{ bgcolor: 'rgba(255, 215, 0, 0.1)' }}>
-                        <CardMedia
-                          component="img"
-                          height="200"
-                          image={winner.image}
-                          alt={winner.title}
-                        />
-                        <CardContent>
-                          <Typography variant="h5" gutterBottom>
-                            {winner.title}
-                          </Typography>
-                          <Typography variant="subtitle1" color="primary" fontWeight="bold">
-                            Producer: {winner.producerName}
-                          </Typography>
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            {winner.description}
-                          </Typography>
-                          <Typography variant="subtitle1" sx={{ 
-                            display: 'inline-block', 
-                            bgcolor: 'secondary.light', 
-                            color: 'white',
-                            px: 2, 
-                            py: 0.5, 
-                            borderRadius: 1,
-                            mt: 2,
-                            fontWeight: 'bold'
-                          }}>
-                            Winner: {winner.category} 🏆
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-          </motion.div>
-        )}
       </Paper>
-    </Container>
+      
+      <Grid container spacing={3}>
+        {displayWinners.map((movie, index) => (
+          <Grid item xs={12} key={movie.id}>
+            <Card 
+              elevation={3}
+              sx={{ 
+                borderRadius: 2,
+                bgcolor: 'rgba(255, 215, 0, 0.05)',
+                border: '1px solid rgba(255, 215, 0, 0.3)'
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <EmojiEventsIcon sx={{ color: 'warning.main', fontSize: 40, mr: 2 }} />
+                  <Typography variant="h5">
+                    {movie.title}
+                  </Typography>
+                  <Chip 
+                    label={`${movie.year ? movie.year : year - index - 1} Winner`}
+                    color="secondary"
+                    sx={{ ml: 2 }}
+                  />
+                </Box>
+                
+                <Divider sx={{ mb: 2 }} />
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={8}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1" color="primary" gutterBottom>
+                        Produced by {movie.producerName}
+                      </Typography>
+                      
+                      <Grid container spacing={2}>
+                        <Grid item xs={6} sm={3}>
+                          <Typography variant="body2" color="text.secondary">
+                            Genre:
+                          </Typography>
+                          <Typography variant="body1">
+                            {movie.genre}
+                          </Typography>
+                        </Grid>
+                        
+                        <Grid item xs={6} sm={3}>
+                          <Typography variant="body2" color="text.secondary">
+                            Lead Actor:
+                          </Typography>
+                          <Typography variant="body1">
+                            {movie.actorName}
+                          </Typography>
+                        </Grid>
+                        
+                        <Grid item xs={6} sm={3}>
+                          <Typography variant="body2" color="text.secondary">
+                            Director:
+                          </Typography>
+                          <Typography variant="body1">
+                            {movie.directorName}
+                          </Typography>
+                        </Grid>
+                        
+                        <Grid item xs={6} sm={3}>
+                          <Typography variant="body2" color="text.secondary">
+                            Audience Score:
+                          </Typography>
+                          <Typography variant="body1">
+                            {movie.audienceScore}/100
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                    
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="subtitle2" gutterBottom>
+                        Critical Acclaim
+                      </Typography>
+                      <Typography variant="body2">
+                        {movie.title} captivated audiences with its {movie.genre.toLowerCase()} storytelling, 
+                        stunning visuals, and powerful performances. The film's cultural impact and artistic 
+                        merit made it the standout choice for the year's highest honor.
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  
+                  <Grid item xs={12} md={4}>
+                    <Paper 
+                      elevation={1} 
+                      sx={{ 
+                        p: 2, 
+                        bgcolor: 'background.default',
+                        height: '100%'
+                      }}
+                    >
+                      <Typography variant="subtitle1" gutterBottom>
+                        Box Office Performance
+                      </Typography>
+                      
+                      <Box sx={{ mb: 1.5 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Budget:
+                        </Typography>
+                        <Typography variant="h6">
+                          ₹{movie.budget.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      
+                      <Box sx={{ mb: 1.5 }}>
+                        <Typography variant="body2" color="text.secondary">
+                          Box Office:
+                        </Typography>
+                        <Typography variant="h6">
+                          ₹{movie.boxOffice.toLocaleString()}
+                        </Typography>
+                      </Box>
+                      
+                      <Box>
+                        <Typography variant="body2" color="text.secondary">
+                          Profit:
+                        </Typography>
+                        <Typography variant="h6" color="success.main">
+                          ₹{movie.profit.toLocaleString()}
+                        </Typography>
+                        <Typography variant="caption">
+                          ({Math.round((movie.profit / movie.budget) * 100)}% ROI)
+                        </Typography>
+                      </Box>
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
