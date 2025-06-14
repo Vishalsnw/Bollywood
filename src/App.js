@@ -30,13 +30,20 @@ const theme = createTheme({
 });
 
 function App() {
+  const producers = [
+    "Golu", "Amit Bagle", "Mangesh", "Vasim", "Amit Randhe", "Khushi", "Ajinkya", "Vinay",
+    "Aashish", "Ashok Singh", "Sandip Basra", "Gokul", "Ritesh", "Bipin", "Ajit Bonde", "Amol Patil",
+    "Hemant", "Ravi Patil", "Sachin Pardesi", "Sachin Patil", "Vishal", "Nitin", "Dipak Trivedi",
+    "Sunil", "Charu", "Bhavesh Chaudhari", "Dipak R", "Mayur", "Nilesh", "Dipak BH", "Sunil"
+  ].map((name, id) => ({ id, name, wealth: Math.floor(Math.random() * 500) + 500 }));
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
           <Routes>
-            <Route path="/" element={<GameScreen />} />
+            <Route path="/" element={<GameScreen producers={producers} />} />
           </Routes>
         </Router>
       </ThemeProvider>
