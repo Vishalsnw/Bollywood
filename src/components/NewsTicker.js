@@ -1,41 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper } from '@mui/material';
-import { motion } from 'framer-motion';
+import React from "react";
+import { Box, Typography, Paper } from "@mui/material";
+import { motion } from "framer-motion";
 
-const NewsTicker = ({ news = [] }) => {
-  const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentNewsIndex((prevIndex) => (prevIndex + 1) % news.length);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [news]);
-  
+const NewsTicker = ({ news }) => {
+  if (!news || news.length === 0) {
+    return null;
+  }
+
   return (
-    <Paper elevation={1} sx={{ 
-      p: 1.5, 
-      borderRadius: 2, 
-      bgcolor: 'primary.light', 
-      color: 'white',
-      overflow: 'hidden'
-    }}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 2 }}>
-          BREAKING NEWS:
+    <Paper 
+      elevation={1} 
+      sx={{ 
+        p: 1.5, 
+        overflow: 'hidden', 
+        borderLeft: '4px solid',
+        borderColor: 'info.main',
+        bgcolor: 'info.light',
+        color: 'info.contrastText'
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', overflow: 'hidden' }}>
+        <Typography 
+          variant="subtitle2" 
+          sx={{ 
+            mr: 2,
+            fontWeight: 'bold',
+            color: 'info.dark'
+          }}
+        >
+          BOLLYWOOD NEWS:
         </Typography>
-        <Box sx={{ overflow: 'hidden', width: '100%' }}>
+        
+        <Box sx={{ overflow: 'hidden', flexGrow: 1 }}>
           <motion.div
-            key={currentNewsIndex}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.5 }}
+            initial={{ x: "100%" }}
+            animate={{ x: "-100%" }}
+            transition={{
+              repeat: Infinity,
+              duration: 20,
+              ease: "linear"
+            }}
+            style={{ 
+              display: 'flex', 
+              whiteSpace: 'nowrap',
+              gap: '40px'
+            }}
           >
-            <Typography variant="body1">
-              {news[currentNewsIndex]}
-            </Typography>
+            {news.map((item, index) => (
+              <Box 
+                key={item.id} 
+                sx={{ 
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  '&::after': {
+                    content: '"•"',
+                    marginLeft: '40px',
+                    color: 'info.dark'
+                  },
+                  '&:last-child::after': {
+                    content: '""'
+                  }
+                }}
+              >
+                <Typography variant="body2">
+                  {item.text}
+                </Typography>
+              </Box>
+            ))}
           </motion.div>
         </Box>
       </Box>
