@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Provider } from "react-redux";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import store from "./store";
 import GameScreen from "./components/GameScreen";
 import Sidebar from "./components/Sidebar";
@@ -29,38 +29,24 @@ const theme = createTheme({
   shape: { borderRadius: 12 },
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
-    h4: {
-      fontWeight: 600,
-    },
-    h5: {
-      fontWeight: 600,
-    },
-    h6: {
-      fontWeight: 600,
-    },
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 600 },
+    h6: { fontWeight: 600 },
   },
   components: {
     MuiButton: {
       styleOverrides: {
-        root: {
-          textTransform: "none",
-          fontWeight: 600,
-        },
+        root: { textTransform: "none", fontWeight: 600 },
       },
     },
     MuiCard: {
       styleOverrides: {
-        root: {
-          borderRadius: 12,
-          overflow: 'hidden',
-        },
+        root: { borderRadius: 12, overflow: "hidden" },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
+        root: { borderRadius: 12 },
       },
     },
   },
@@ -68,17 +54,22 @@ const theme = createTheme({
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Debug log to confirm App component mounted
+  useEffect(() => {
+    console.log("App mounted");
+  }, []);
+
   // Current date and time display
   const currentDate = "2025-06-14 16:33:11";
-  const formattedDate = new Date(currentDate).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const formattedDate = new Date(currentDate).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -87,11 +78,13 @@ function App() {
         <CssBaseline />
         <GameProvider>
           <Router>
-            <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+            >
               <AppBar position="fixed" color="primary" elevation={0}>
                 <Toolbar>
-                  <IconButton 
-                    color="inherit" 
+                  <IconButton
+                    color="inherit"
                     onClick={toggleSidebar}
                     size="large"
                     edge="start"
@@ -100,23 +93,21 @@ function App() {
                   >
                     <MenuIcon />
                   </IconButton>
-                  
+
                   <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     Bollywood Tycoon
                   </Typography>
-                  
+
                   <Typography variant="body2" sx={{ mr: 2 }}>
                     {formattedDate}
                   </Typography>
-                  
-                  <Typography variant="body2">
-                    User: Vishalsnw
-                  </Typography>
+
+                  <Typography variant="body2">User: Vishalsnw</Typography>
                 </Toolbar>
               </AppBar>
-              
+
               <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
-              
+
               <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
                 <Routes>
                   <Route path="/" element={<GameScreen />} />
