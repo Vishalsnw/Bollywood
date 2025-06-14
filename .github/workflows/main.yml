@@ -11,25 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           yarn install --frozen-lockfile || yarn install
 
-      - name: Lint and detect file errors
+      - name: 🔍 Lint and detect file errors
         run: |
           echo "Running ESLint check..."
-          yarn add eslint --dev
+          yarn add eslint@8 --dev
           npx eslint src/ || echo "⚠️ ESLint completed with warnings or errors"
 
-      - name: Check if critical files exist
+      - name: 📁 Check if critical files exist
         run: |
           echo "🔍 Checking required files..."
           FILES=(
@@ -54,7 +54,7 @@ jobs:
             fi
           done
 
-      - name: Try Build
+      - name: 🏗 Try Build
         run: |
           echo "🛠 Trying to build project..."
           yarn build || echo "❌ Build failed — check above logs"
