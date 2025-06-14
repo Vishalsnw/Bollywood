@@ -1,11 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { 
   advanceMonth, 
   advanceYear, 
   startOscarNominations, 
-  revealOscarWinner, 
-  createMovie,
+  revealOscarWinner,
   rentStudio,
   signActor
 } from "../features/game/gameSlice";
@@ -20,10 +19,12 @@ export const useGameContext = () => useContext(GameContext);
 export const GameProvider = ({ children }) => {
   const dispatch = useDispatch();
   const {
+    // These selectors will match your new slice structure; update if your state shape changes
     loading,
     error,
     currentUser,
-    gameTime,
+    year,
+    month,
     studios,
     actors,
     directors,
@@ -36,9 +37,6 @@ export const GameProvider = ({ children }) => {
     nominations,
     oscarWinner
   } = useSelector(state => state.game);
-
-  // Extract year and month from gameTime
-  const { year, month } = gameTime;
 
   // Handle advancing to the next month
   const handleAdvanceMonth = () => {
@@ -58,11 +56,6 @@ export const GameProvider = ({ children }) => {
   // Handle revealing Oscar winner
   const handleRevealOscarWinner = () => {
     dispatch(revealOscarWinner());
-  };
-
-  // Handle movie creation
-  const handleCreateMovie = async (movieData) => {
-    await dispatch(createMovie(movieData));
   };
 
   // Handle studio rental
@@ -97,7 +90,6 @@ export const GameProvider = ({ children }) => {
     advanceYear: handleAdvanceYear,
     startOscarNominations: handleStartOscarNominations,
     revealOscarWinner: handleRevealOscarWinner,
-    createMovie: handleCreateMovie,
     rentStudio: handleRentStudio,
     signActor: handleSignActor
   };
