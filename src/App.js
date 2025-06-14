@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Provider } from "react-redux";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import store from "./store";
 import GameScreen from "./components/GameScreen";
+import Sidebar from "./components/Sidebar";
+import ProducersPage from "./features/producers/ProducersPage";
+import NewsPage from "./features/news/NewsPage";
+import OscarWinnersPage from "./features/oscars/OscarWinnersPage";
+import { Box, IconButton } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 
 // MUI Theme
 const theme = createTheme({
@@ -30,6 +36,12 @@ const theme = createTheme({
 });
 
 function App() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   const producers = [
     "Golu", "Amit Bagle", "Mangesh", "Vasim", "Amit Randhe", "Khushi", "Ajinkya", "Vinay",
     "Aashish", "Ashok Singh", "Sandip Basra", "Gokul", "Ritesh", "Bipin", "Ajit Bonde", "Amol Patil",
@@ -42,9 +54,30 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Routes>
-            <Route path="/" element={<GameScreen producers={producers} />} />
-          </Routes>
+          <Box sx={{ display: "flex" }}>
+            <Box sx={{ position: "fixed", top: 10, left: 10, zIndex: 1100 }}>
+              <IconButton 
+                color="primary" 
+                onClick={toggleSidebar}
+                size="large"
+                edge="start"
+                aria-label="menu"
+              >
+                <MenuIcon />
+              </IconButton>
+            </Box>
+            
+            <Sidebar open={sidebarOpen} toggleSidebar={toggleSidebar} />
+            
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <Routes>
+                <Route path="/" element={<GameScreen producers={producers} />} />
+                <Route path="/producers" element={<ProducersPage producers={producers} />} />
+                <Route path="/news" element={<NewsPage />} />
+                <Route path="/oscars/winners" element={<OscarWinnersPage />} />
+              </Routes>
+            </Box>
+          </Box>
         </Router>
       </ThemeProvider>
     </Provider>
