@@ -12,39 +12,48 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 16
-
     - name: Find direct array mutations
+      id: mutation-scan
+      continue-on-error: true  # Important: don't fail if finds issues
       run: |
         echo "🔍 Scanning for direct array mutations..."
-        # Search for common mutation patterns
-        PROBLEM_FILES=$(grep -rnw 'src/' -e '\[[0-9]+\]\s*=' --include=\*.js --include=\*.jsx)
-        DIRECT_PUSH=$(grep -rnw 'src/' -e '\.push(' --include=\*.js --include=\*.jsx)
-        DIRECT_SPLICE=$(grep -rnw 'src/' -e '\.splice(' --include=\*.js --include=\*.jsx)
-        DIRECT_SORT=$(grep -rnw 'src/' -e '\.sort(' --include=\*.js --include=\*.jsx | grep -v '\.slice()\.sort(')
-
-        # Combine all results
-        ALL_RESULTS="$PROBLEM_FILES\n$DIRECT_PUSH\n$DIRECT_SPLICE\n$DIRECT_SORT"
         
-        # Count issues
-        ISSUE_COUNT=$(echo "$ALL_RESULTS" | grep -v '^$' | wc -l)
+        # Search patterns (with || true to prevent grep exit code 1)
+        PROBLEM_FILES=$(grep -rnw 'src/' -e '\[[0-9]+\]\s*=' --include=\*.js --include=\*.jsx || true)
+        DIRECT_PUSH=$(grep -rnw 'src/' -e '\.push(' --include=\*.js --include=\*.jsx || true)
+        DIRECT_SPLICE=$(grep -rnw 'src/' -e '\.splice(' --include=\*.js --include=\*.jsx || true)
+        DIRECT_SORT=$(grep -rnw 'src/' -e '\.sort(' --include=\*.js --include=\*.jsx | grep -v '\.slice()\.sort(' || true)
+
+        # Combine results
+        ALL_RESULTS="$PROBLEM_FILES\n$DIRECT_PUSH\n$DIRECT_SPLICE\n$DIRECT_SORT"
+        ISSUE_COUNT=$(echo "$ALL_RESULTS" | grep -v '^$' | wc -l | tr -d ' ')
+        
+        # Set outputs
+        echo "issue_count=$ISSUE_COUNT" >> $GITHUB_OUTPUT
+        echo "$ALL_RESULTS" > mutation_scan_results.txt
         
         if [ $ISSUE_COUNT -gt 0 ]; then
-          echo "🚨 Found $ISSUE_COUNT potential array mutation issues:"
-          echo "$ALL_RESULTS"
-          echo "::warning::Found $ISSUE_COUNT potential array mutation issues"
-          # Create artifact with results
-          echo "$ALL_RESULTS" > mutation_scan_results.txt
+          echo "🚨 Found $ISSUE_COUNT potential array mutation issues"
         else
           echo "✅ No direct array mutations found"
         fi
 
     - name: Upload scan results
-      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: array-mutation-scan-results
         path: mutation_scan_results.txt
+
+    - name: Create PR comment if issues found
+      if: steps.mutation-scan.outputs.issue_count > 0
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const results = fs.readFileSync('mutation_scan_results.txt', 'utf8');
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `⚠️ Array Mutation Scan Results:\n\n\`\`\`\n${results}\n\`\`\`\nPlease fix these potential issues.`
+          })
