@@ -1,5 +1,4 @@
-name: React App Inspector
-
+name: Find Array Mutations
 on:
   push:
     branches: [ main ]
@@ -7,54 +6,45 @@ on:
     branches: [ main ]
 
 jobs:
-  inspect-app:
+  scan-for-mutations:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: ⚙️ Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
 
-      - name: 📦 Install dependencies
-        run: |
-          yarn install --frozen-lockfile || yarn install
+    - name: Find direct array mutations
+      run: |
+        echo "🔍 Scanning for direct array mutations..."
+        # Search for common mutation patterns
+        PROBLEM_FILES=$(grep -rnw 'src/' -e '\[[0-9]+\]\s*=' --include=\*.js --include=\*.jsx)
+        DIRECT_PUSH=$(grep -rnw 'src/' -e '\.push(' --include=\*.js --include=\*.jsx)
+        DIRECT_SPLICE=$(grep -rnw 'src/' -e '\.splice(' --include=\*.js --include=\*.jsx)
+        DIRECT_SORT=$(grep -rnw 'src/' -e '\.sort(' --include=\*.js --include=\*.jsx | grep -v '\.slice()\.sort(')
 
-      - name: 🔍 Lint and detect file errors
-        run: |
-          echo "Running ESLint check..."
-          yarn add eslint@8 --dev
-          npx eslint src/ || echo "⚠️ ESLint completed with warnings or errors"
+        # Combine all results
+        ALL_RESULTS="$PROBLEM_FILES\n$DIRECT_PUSH\n$DIRECT_SPLICE\n$DIRECT_SORT"
+        
+        # Count issues
+        ISSUE_COUNT=$(echo "$ALL_RESULTS" | grep -v '^$' | wc -l)
+        
+        if [ $ISSUE_COUNT -gt 0 ]; then
+          echo "🚨 Found $ISSUE_COUNT potential array mutation issues:"
+          echo "$ALL_RESULTS"
+          echo "::warning::Found $ISSUE_COUNT potential array mutation issues"
+          # Create artifact with results
+          echo "$ALL_RESULTS" > mutation_scan_results.txt
+        else
+          echo "✅ No direct array mutations found"
+        fi
 
-      - name: 📁 Check if critical files exist
-        run: |
-          echo "🔍 Checking required files..."
-          FILES=(
-            "src/components/GameScreen.js"
-            "src/components/Sidebar.js"
-            "src/features/producers/ProducersPage.js"
-            "src/features/news/NewsPage.js"
-            "src/features/oscars/OscarWinnersPage.js"
-            "src/features/studios/StudioPage.js"
-            "src/features/actors/ActorsPage.js"
-            "src/features/market/MarketPage.js"
-            "src/context/GameContext.js"
-            "src/store.js"
-          )
-
-          for file in "${FILES[@]}"; do
-            if [[ ! -f "$file" ]]; then
-              echo "❌ Missing: $file"
-              exit 1
-            else
-              echo "✅ Found: $file"
-            fi
-          done
-
-      - name: 🏗 Try Build
-        run: |
-          echo "🛠 Trying to build project..."
-          yarn build || echo "❌ Build failed — check above logs"
+    - name: Upload scan results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: array-mutation-scan-results
+        path: mutation_scan_results.txt
